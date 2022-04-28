@@ -8,35 +8,8 @@ var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_we
 console.log("entered logic.js");
 // Perform a GET request to the query URL.
 d3.json(queryUrl).then(function (data) {
-  console.log(data.features);
-  console.log("calling createMap with data.features");
   createMap(data.features);
 });
-
-/*Setup Leaflet Legend based on codepen.io example*/
-var map = L.map("mapid").setView([55.67, 12.57], 7);
-L.tileLayer(
-  "https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg"
-).addTo(map);
-
-/*Legend specific*/
-var legend = L.control({ position: "bottomleft" });
-
-legend.onAdd = function(map) {
-  var div = L.DomUtil.create("div", "legend");
-  div.innerHTML += "<h4>Legend</h4>";
-  div.innerHTML += '<i style="background: Chartreuse"></i><span>-10-10</span><br>';
-  div.innerHTML += '<i style="background: GreenYellow"></i><span>10-30</span><br>';
-  div.innerHTML += '<i style="background: #Yellow"></i><span>30-50</span><br>';
-  div.innerHTML += '<i style="background: #Gold"></i><span>50-70</span><br>';
-  div.innerHTML += '<i style="background: #GoldenRod"></i><span>70-90</span><br>';
-  div.innerHTML += '<i style="background: #Red"></i><span>90+</span><br>';
-  div.innerHTML += '<i class="icon" style="background-image: url(https://d30y9cdsu7xlg0.cloudfront.net/png/194515-200.png);background-repeat: no-repeat;"></i><span>Grænse</span><br>';
-  
-  return div;
-};
-
-legend.addTo(map);
 
 
 function createMap(earthquakes) {
@@ -61,14 +34,15 @@ function createMap(earthquakes) {
 
   let quakeLayer = L.layerGroup(quakeMarkers);
   // Create the base layers.
+  console.log("near street =");
   var street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
-
+  console.log("near topo =");
   var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
   });
-
+  console.log("near baseMaps =");
   // Create a baseMaps object.
   var baseMaps = {
     "Street Map": street,
@@ -76,23 +50,52 @@ function createMap(earthquakes) {
   };
 
   // Creat an overlays object.
-
+  console.log("near overlayMaps =");
   var overlayMaps = {
     quakes: quakeLayer,
   };
-  // Create a new map.
-  // Edit the code to add the earthquake data to the layers.
+
+
+  // // Create a new map.
+  // // Edit the code to add the earthquake data to the layers.
+  // console.log("near myMap =");
+  // var myMap = L.map("map", {
+  //   center: [
+  //     37.09, -95.71
+  //   ],
+  //   zoom: 5,
+  //   layers: [street, quakeLayer]
+  // });
+
+
+  // // Create a layer control that contains our baseMaps.
+  // // Be sure to add an overlay Layer that contains the earthquake GeoJSON.
+  // console.log("near L.control.layers");
+  // L.control.layers(baseMaps, overlayMaps).addTo(myMap);
+  // console.log("after L.control.layers");
+
+
+  // Create our map, giving it the streetmap and earthquakes layers to display on load.
   var myMap = L.map("map", {
     center: [
       37.09, -95.71
     ],
     zoom: 5,
-    layers: [street, quakeLayer]
+    layers: [street, earthquakes]
   });
 
-  // Create a layer control that contains our baseMaps.
-  // Be sure to add an overlay Layer that contains the earthquake GeoJSON.
-  L.control.layers(baseMaps, overlayMaps).addTo(myMap);
+  // Create a layer control.
+  // Pass it our baseMaps and overlayMaps.
+  // Add the layer control to the map.
+  console.log("near L.control.layers");
+  L.control.layers(baseMaps, overlayMaps, {
+    collapsed: false
+  }).addTo(myMap);
+
+  console.log("after L.control.layers");
+
+
+
 
 }
 
